@@ -34,7 +34,7 @@ io.sockets.on('connection', function (socket){
 				break;
 			}
 		}
-		io.sockets.emit("data_players",players)
+		io.sockets.emit("data_players",players);
 		socket.broadcast.json.emit(players);
 	});
 });
