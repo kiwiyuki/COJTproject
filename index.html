@@ -5,6 +5,8 @@
 	<title>WebSocket_Test</title>
 
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="socket.io.js"></script>
+
 	<style>
 	html, body {
 		width: 100%;
@@ -28,6 +30,7 @@
 <body>
 	<canvas id="canvas"></canvas>
 	<script>
+
 	var canvasID = document.getElementById("canvas");
 	var ctx = canvasID.getContext("2d");
 	// canvas サイズ変更
@@ -35,6 +38,7 @@
 	canvasID.setAttribute("height", "480");
 
 	var mySquare = new Square(0, 0);
+	var players = [];
 
 	function Square(x, y) {
 		this.x = x;
@@ -45,8 +49,9 @@
 	}
 
 	Square.prototype.draw = function() {
-		ctx.fillStyle = this.color;
 		var halfWidth = this.size / 2;
+
+		ctx.fillStyle = this.color;
 		ctx.fillRect(this.x - halfWidth, this.y - halfWidth, this.size, this.size);
 	}
 
@@ -76,6 +81,8 @@
 
 		console.log("keycode : " + e.keyCode);
 	}
+
+	// socket.io 処理
 	</script>
 </body>
 </html>
