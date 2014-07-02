@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>WebSocket_Test</title>
+
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<style>
+	html, body {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+
+		overflow: hidden;
+		background: #111;
+		text-align: center;
+	}
+
+	#canvas {
+		margin: auto;
+		margin-top: 30px;
+
+		background: #fff;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script>
+	var canvasID = document.getElementById("canvas");
+	var ctx = canvasID.getContext("2d");
+	// canvas サイズ変更
+	canvasID.setAttribute("width", "600");
+	canvasID.setAttribute("height", "480");
+
+	var mySquare = new Square(0, 0);
+
+	function Square(x, y) {
+		this.x = x;
+		this.y = y;
+		this.size = 10;
+
+		this.color = "red";
+	}
+
+	Square.prototype.draw = function() {
+		ctx.fillStyle = this.color;
+		var halfWidth = this.size / 2;
+		ctx.fillRect(this.x - halfWidth, this.y - halfWidth, this.size, this.size);
+	}
+
+	// ループ（fps: 30）
+	setInterval(function() {
+		ctx.clearRect(0, 0, 600, 480);
+		mySquare.draw();
+	}, 33);
+
+	// イベントリスナー
+	window.addEventListener("keydown", onKeyDown, false);
+	function onKeyDown(e) {
+		switch(e.keyCode) {
+			case 37:
+			mySquare.x += -2;
+			break;
+			case 38:
+			mySquare.y += -2;
+			break;
+			case 39:
+			mySquare.x += 2;
+			break;
+			case 40:
+			mySquare.y += 2;
+			break;
+		}
+
+		console.log("keycode : " + e.keyCode);
+	}
+	</script>
+</body>
+</html>
