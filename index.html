@@ -3,8 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title>WebSocket_Test</title>
-
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<!-- // <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script> -->
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<style>
 	html, body {
 		width: 100%;
@@ -51,11 +51,12 @@
 	}
 
 	// ループ（fps: 30）
-	setInterval(function() {
-		ctx.clearRect(0, 0, 600, 480);
-		mySquare.draw();
-	}, 33);
+	// setInterval(function() {
+	// 	ctx.clearRect(0, 0, 600, 480);
+	// 	mySquare.draw();
+	// }, 33);
 
+		var socket = io.connect();
 	// イベントリスナー
 	window.addEventListener("keydown", onKeyDown, false);
 	function onKeyDown(e) {
@@ -73,9 +74,21 @@
 			mySquare.y += 2;
 			break;
 		}
+		socket.json.emit('data_change', {
+			x: mySquare.x,
+			y: mySquare.y
+		});
 
-		console.log("keycode : " + e.keyCode);
+		// console.log("keycode : " + e.keyCode);
 	}
+	socket.on('data_players',function (data) {
+		// console.log(socket);	
+		ctx.clearRect(0, 0, 600, 480);
+		for(var i = 0 ; i < data.length;i++) {
+			var s = new Square(data[i].x,data[i].y);
+			s.draw();
+		}
+	});
 	</script>
 </body>
 </html>

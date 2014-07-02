@@ -1,7 +1,7 @@
 var server = require('http').createServer(httpHandler);
 var	io = require('socket.io').listen(server);
 var fs= require('fs');
-server.listen(80);
+server.listen(8000);
 
 function httpHandler (req, res) {
 	fs.readFile(__dirname + '/index.html', function  (err, data) {
@@ -25,6 +25,7 @@ io.sockets.on('connection', function (socket){
 		"y"	: 0
 	};
 	players.push(p);
+
 	socket.on('data_change', function (data) {
 		for(var i = 0; i < players.length; i++) {
 			var pyr = players[i];
@@ -34,7 +35,19 @@ io.sockets.on('connection', function (socket){
 				break;
 			}
 		}
-		io.sockets.emit("data_players",players);
-		socket.broadcast.json.emit(players);
+	});
+	setInterval(function () {
+		io.sockets.emit("data_players", players);
+	}, 33);
+	socket.on('disconnect', function () {
+		var n = 0;
+		for (var i = 0; i < players.length; i++) {
+			var pyr = players[i];
+			if(pyr["id"] == socket.id) {
+				n = i;
+				break;
+			}
+		}
+		players.splice(n, 1);
 	});
 });
