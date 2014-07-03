@@ -28,24 +28,37 @@
 <body>
 	<canvas id="canvas"></canvas>
 	<script>
+	// サーバー接続
+	var socket = io.connect();
 
+	// canvas 初期化
 	var canvasID = document.getElementById("canvas");
 	var ctx = canvasID.getContext("2d");
+	var canvasWidth = 600;
+	var canvasHeight = 480;
 	// canvas サイズ変更
-	canvasID.setAttribute("width", "600");
-	canvasID.setAttribute("height", "480");
+	canvasID.setAttribute("width", canvasWidth);
+	canvasID.setAttribute("height", canvasHeight);
 
-	var mySquare = new Square(0, 0);
+	// 自プレイヤー用
+	var mySquare = new Square(canvasWidth / 2, canvasHeight / 2);
+	mySquare.color = "red";
+	var vX = 0;
+	var vY = 0;
+	var speed = 3;
+
+	// 全プレイヤー情報格納配列
 	var players = [];
 
+	// 四角形オブジェクト定義
 	function Square(x, y) {
 		this.x = x;
 		this.y = y;
 		this.size = 10;
 
-		this.color = "red";
+		this.color = "black";
 	}
-
+	// 描画
 	Square.prototype.draw = function() {
 		var halfWidth = this.size / 2;
 
@@ -53,46 +66,98 @@
 		ctx.fillRect(this.x - halfWidth, this.y - halfWidth, this.size, this.size);
 	}
 
-	// ループ（fps: 30）
-	// setInterval(function() {
-	// 	ctx.clearRect(0, 0, 600, 480);
-	// 	mySquare.draw();
-	// }, 33);
+	// 状態更新
+	function update() {
+		// 画面消去
+		ctx.clearRect(0, 0, 600, 480);
 
-		var socket = io.connect();
-	// イベントリスナー
-	window.addEventListener("keydown", onKeyDown, false);
-	function onKeyDown(e) {
-		switch(e.keyCode) {
-			case 37:
-			mySquare.x += -2;
-			break;
-			case 38:
-			mySquare.y += -2;
-			break;
-			case 39:
-			mySquare.x += 2;
-			break;
-			case 40:
-			mySquare.y += 2;
-			break;
+		// 全プレイヤー描画
+		for(var i = 0 ; i < players.length;i++) {
+			var p = new Square(players[i].x, players[i].y);
+			p.draw();
 		}
-		socket.json.emit('data_change', {
+
+		// 位置情報送信
+		socket.json.emit('data_update', {
 			x: mySquare.x,
 			y: mySquare.y
 		});
 
-		// console.log("keycode : " + e.keyCode);
+		// プレイヤー状態更新
+		mySquare.draw();
+		mySquare.x += vX;
+		mySquare.y += vY;
 	}
-	socket.on('data_players',function (data) {
-		ctx.clearRect(0, 0, 600, 480);
-		for(var i = 0 ; i < data.length;i++) {
-			var s = new Square(data[i].x,data[i].y);
-			s.draw();
+
+	// イベントリスナー
+	window.addEventListener("keydown", onKeyDown, false);
+	window.addEventListener("keyup", onKeyUp, false);
+	function onKeyDown(e) {
+		switch(e.keyCode) {
+			case 37:
+			e.preventDefault();
+			vX = -speed;
+			break;
+
+			case 38:
+			e.preventDefault();
+			vY = -speed;
+			break;
+
+			case 39:
+			e.preventDefault();
+			vX = speed;
+			break;
+
+			case 40:
+			e.preventDefault();
+			vY = speed;
+			break;
 		}
+	}
+
+	function onKeyUp(e) {
+		switch(e.keyCode) {
+			case 37:
+			e.preventDefault();
+			vX = vX > 0 ? vX : 0;
+			break;
+
+			case 38:
+			e.preventDefault();
+			vY = vY > 0 ? vY : 0;
+			break;
+
+			case 39:
+			e.preventDefault();
+			vX = vX < 0 ? vX : 0;
+			break;
+
+			case 40:
+			e.preventDefault();
+			vY = vY < 0 ? vY : 0;
+			break;
+		}
+	}
+
+	// 他プレイヤー情報受信
+	socket.on('data_players',function (data) {
+		var p = [];
+		for(var i = 0 ; i < data.length;i++) {
+			var s = new Square(data[i].x, data[i].y);
+			p.push(s);
+		}
+		players = p;
+
+		update();
 	});
 
-	// socket.io 処理
+	/*
+	// ループ（fps: 30）
+	setInterval(function() {
+		update();
+	}, 33);
+	*/
 	</script>
 </body>
 </html>
