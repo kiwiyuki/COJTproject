@@ -23,8 +23,40 @@ function httpHandler (req, res) {
 // 全プレイヤー情報格納配列
 var players = [];
 
+// AIプレイヤー情報格納配列
+var aiPlayers = [];
+// AIプレイヤー数
+var aiNumber = 300;
+
+// AI用意
+for (var i = 0; i < aiNumber; i++) {
+	aiPlayers.push(new AI(300, 240, Math.random() * 5, Math.random() * 5));
+}
+
+// AI定義
+function AI(x, y, vX, vY) {
+	this.x = x;
+	this.y = y;
+	this.vX = vX;
+	this.vY = vY;
+}
+// 移動
+AI.prototype.move = function() {
+	// 壁との当たり判定
+	if (this.x < 0 || this.x > 600) {
+		this.vX = - this.vX;
+	}
+	
+	if (this.y < 0 || this.y > 480) {
+		this.vY = - this.vY;
+	}
+
+	this.x += this.vX;
+	this.y += this.vY;
+}
+
 // プレイヤー接続処理
-io.sockets.on('connection', function (socket){
+io.sockets.on('connection', function(socket) {
 	// プレイヤー情報登録
 	var p = {
 		id : socket.id,
@@ -34,7 +66,7 @@ io.sockets.on('connection', function (socket){
 	players.push(p);
 
 	// プレイヤー状態受信
-	socket.on('data_update', function (data) {
+	socket.on('data_update', function(data) {
 		for(var i = 0; i < players.length; i++) {
 			var pyr = players[i];
 
@@ -47,7 +79,7 @@ io.sockets.on('connection', function (socket){
 	});
 
 	// 切断処理
-	socket.on('disconnect', function () {
+	socket.on('disconnect', function() {
 		var n = 0;
 		for (var i = 0; i < players.length; i++) {
 			var pyr = players[i];
@@ -61,7 +93,14 @@ io.sockets.on('connection', function (socket){
 });
 
 // ループ処理
-setInterval(function () {
+setInterval(function() {
+	// AI更新
+	for (var i = 0; i < aiNumber; i++) {
+		aiPlayers[i].move();
+	}
+	// AI情報更新
+	io.sockets.emit("data_ai", aiPlayers);
+
 	// 各プレイヤー位置情報送信
 	io.sockets.emit("data_players", players);
 }, 33);

@@ -41,8 +41,7 @@
 	canvasID.setAttribute("height", canvasHeight);
 
 	// 自プレイヤー用
-	var mySquare = new Square(canvasWidth / 2, canvasHeight / 2);
-	mySquare.color = "red";
+	var mySquare = new Square(canvasWidth / 2, canvasHeight / 2, "red");
 	var vX = 0;
 	var vY = 0;
 	var speed = 3;
@@ -50,13 +49,16 @@
 	// 全プレイヤー情報格納配列
 	var players = [];
 
+	// AI 情報格納配列
+	var aiPlayers = [];
+
 	// 四角形オブジェクト定義
-	function Square(x, y) {
+	function Square(x, y, color) {
 		this.x = x;
 		this.y = y;
 		this.size = 10;
 
-		this.color = "black";
+		this.color = color;
 	}
 	// 描画
 	Square.prototype.draw = function() {
@@ -73,14 +75,18 @@
 
 		// 全プレイヤー描画
 		for(var i = 0 ; i < players.length;i++) {
-			var p = new Square(players[i].x, players[i].y);
-			p.draw();
+			players[i].draw();
+		}
+
+		// AI 描画
+		for(var i = 0 ; i < aiPlayers.length;i++) {
+			aiPlayers[i].draw();
 		}
 
 		// 位置情報送信
 		socket.json.emit('data_update', {
-			x: mySquare.x,
-			y: mySquare.y
+			"x" : mySquare.x,
+			"y" : mySquare.y
 		});
 
 		// プレイヤー状態更新
@@ -144,20 +150,30 @@
 	socket.on('data_players',function (data) {
 		var p = [];
 		for(var i = 0 ; i < data.length;i++) {
-			var s = new Square(data[i].x, data[i].y);
+			var s = new Square(data[i].x, data[i].y, "blue");
 			p.push(s);
 		}
 		players = p;
 
-		update();
+		// update();
 	});
 
-	/*
+	// AI 情報受信
+	socket.on('data_ai',function (data) {
+		var ai = [];
+		for(var i = 0 ; i < data.length;i++) {
+			var s = new Square(data[i].x, data[i].y, "black");
+			ai.push(s);
+		}
+		aiPlayers = ai;
+	});
+
+	
 	// ループ（fps: 30）
 	setInterval(function() {
 		update();
 	}, 33);
-	*/
-	</script>
+
+</script>
 </body>
 </html>
