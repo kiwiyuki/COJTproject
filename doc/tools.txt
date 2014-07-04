@@ -3,9 +3,6 @@ tools
 GitHub
 https://github.com/kiwiyuki/COJTproject
 
-ガントチャート
-https://brabioproject.appspot.com/project/ahJzfmJyYWJpb3Byb2plY3RocmRyEQsSB1Byb2plY3QY2drO0AIM/
-
 dotinstall
 	three.js
 		http://dotinstall.com/lessons/basic_threejs
@@ -15,3 +12,6 @@ dotinstall
 		http://dotinstall.com/lessons/basic_socketio
 	MySQL
 		http://dotinstall.com/lessons/basic_mysql_v2
+
+socket.io tips
+	http://yosuke-furukawa.hatenablog.com/entry/2014/05/30/093103
