@@ -1,14 +1,5 @@
-// モジュール読み込み
-var server = require('http').createServer(httpHandler);
-var	io = require('socket.io').listen(server);
-var fs= require('fs');
-
-// サーバー待ち受け開始
-server.listen(8000);
-console.log("server listening...");
-
-// HTTPハンドラ
-function httpHandler (req, res) {
+// サーバー構築
+var server = require('http').createServer(function(req, res) {
 	fs.readFile(__dirname + '/index.html', function(err, data) {
 		if (err) {
 			res.writeHead(500);
@@ -18,7 +9,15 @@ function httpHandler (req, res) {
 		res.write(data);
 		res.end();
 	});
-}
+});
+
+// サーバー待ち受け開始
+server.listen(8000);
+console.log("server listening...");
+
+// モジュール読み込み
+var	io = require('socket.io').listen(server);
+var fs= require('fs');
 
 // 全プレイヤー情報格納配列
 var players = [];
